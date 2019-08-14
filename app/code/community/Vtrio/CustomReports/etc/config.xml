@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+<config>
+	<modules>
+		<Vtrio_CustomReports>
+			<version>1.0.0</version>
+		</Vtrio_CustomReports>
+	</modules>
+	<global>
+		<blocks>
+			<customreports>
+				 <class>Vtrio_CustomReports_Block</class>
+			</customreports>
+		</blocks>
+		<helpers>
+			<customreports>
+				 <class>Vtrio_CustomReports_Helper</class>
+			</customreports>
+		</helpers>
+	  	<models>
+		   <customreports>
+		       <class>Vtrio_CustomReports_Model</class>
+		   </customreports>
+	  	</models>
+	</global>
+	<admin>
+		<routers>
+			<customreports>
+				<use>admin</use>
+				<args>
+					<module>Vtrio_CustomReports</module>
+					<frontName>customreports</frontName>
+				</args>
+			</customreports>
+		</routers>
+	</admin>
+</config> 

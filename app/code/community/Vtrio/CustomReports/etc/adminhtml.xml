@@ -1,0 +1,15 @@
+<config>
+	<menu>
+	  <report>
+			<title>Reports</title>
+			<sort_order>80</sort_order>		  
+			 <children>
+			   <customreport>
+				 <title>Custom Reports</title>
+				 <action>customreports/report_index/customreport</action>
+				 <sort_order>10</sort_order>
+			   </customreport>
+			 </children>
+	  </report>
+	</menu>    
+</config>

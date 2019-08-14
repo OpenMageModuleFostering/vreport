@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<package>
+    <name>VReport</name>
+    <version>1.0.0</version>
+    <stability>stable</stability>
+    <license uri="http://opensource.org/licenses/osl-3.0.php">MITL</license>
+    <channel>community</channel>
+    <extends/>
+    <summary>VReport module helps users to generate reports in more user friendly and business prospective way.</summary>
+    <description>VReport module helps users to generate reports in more user friendly and business prospective way. The report can be generated Category and Sub Categories wise. Additionaly the module provides time based and Order Status based filters and export options.Export file contains details like Product Name,SKU,total Price,Quantity Ordered, shipping and billing addres. The report will help store owners in setting business plans based on order status and category.</description>
+    <notes>First stable version</notes>
+    <authors><author><name>Developer</name><user>Developer</user><email>dev@vtrio.com</email></author></authors>
+    <date>2016-03-11</date>
+    <time>05:11:05</time>
+    <contents><target name="mageskin"><dir name="adminhtml"><dir name="default"><dir name="default"><dir name="vtriocustomreport"><file name="pagination.css" hash="3e61bea82df74a73e3b00c1952aa9770"/></dir></dir></dir></dir></target><target name="magedesign"><dir name="adminhtml"><dir name="default"><dir name="default"><dir name="template"><dir name="vtrio"><dir name="customreports"><file name="gridproduct.phtml" hash="07dedcdaff3a17bc8510bb1f38e257e0"/></dir></dir></dir></dir></dir></dir></target><target name="mage"><dir name="app"><dir name="code"><dir name="community"><dir name="Vtrio"><dir name="CustomReports"><dir name="Block"><dir name="Report"><dir name="Custom"><file name="Grid.php" hash="97be1eeaff2eabf3ed16dd4214a3abf9"/></dir><file name="Custom.php" hash="53ca9fae5564ba0c877c1a8e6e89e5e1"/></dir></dir><dir name="Helper"><file name="Data.php" hash="4fe236db0b3efb39c7283593a14dbbfe"/></dir><dir name="Model"><file name="Collection.php" hash="b479f4ec0e9b3c131b57910f227f634c"/></dir><dir name="controllers"><dir name="Report"><file name="IndexController.php" hash="1afc4f670300dfe40466ebe75c182420"/></dir></dir><dir name="etc"><file name="adminhtml.xml" hash="08112c6bf1a058fce42ee7a8f87b34c5"/><file name="config.xml" hash="0eb9f31ed975e9ef178a34a191009eda"/></dir></dir></dir></dir></dir><dir name="etc"><dir><dir name="modules"><file name="Vtrio_CustomReports.xml" hash="b476d1292e2a46bac9e48dcefa7672a8"/></dir></dir></dir></dir><dir name="modules"><file name="Vtrio_CustomReports.xml" hash=""/></dir></target></contents>
+    <compatible/>
+    <dependencies><required><php><min>5.3.0</min><max>7.0.0</max></php></required></dependencies>
+</package>

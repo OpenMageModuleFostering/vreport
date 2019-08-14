@@ -1,0 +1,356 @@
+<link rel="stylesheet" type="text/css" href="<?php echo $this->getSkinUrl('vtriocustomreport/pagination.css');?>" />
+<?php
+
+if($this->getRequest()->getParams()){
+	$key					=	($this->getRequest()->getParam('key'))?$this->getRequest()->getParam('key'):'';
+	$catId				=	($this->getRequest()->getParam('category'))?$this->getRequest()->getParam('category'):'';
+	$subCatId			=	($this->getRequest()->getParam('subcategory'))?$this->getRequest()->getParam('subcategory'):'';
+	$from					=	($this->getRequest()->getParam('from'))?$this->getRequest()->getParam('from'):'';
+	$to					=	($this->getRequest()->getParam('to'))?$this->getRequest()->getParam('to'):'';
+	$report_period		=	($this->getRequest()->getParam('report_period'))?$this->getRequest()->getParam('report_period'):'';
+	$store_ids			=	($this->getRequest()->getParam('store_ids'))?$this->getRequest()->getParam('store_ids'):'';	
+	$website1				=	($this->getRequest()->getParam('website'))?$this->getRequest()->getParam('website'):'';	
+	$website2				=	($this->getRequest()->getParam('store'))?$this->getRequest()->getParam('store'):'';	
+	$website3				=	($this->getRequest()->getParam('group'))?$this->getRequest()->getParam('group'):'';	
+	$export				=	($this->getRequest()->getParam('export'))?$this->getRequest()->getParam('export'):'';	
+	$showOrderStatus	=	($this->getRequest()->getParam('show_order_statuses'))?$this->getRequest()->getParam('show_order_statuses'):'';		
+	if($showOrderStatus == '1'){
+		$order_statuses=	($this->getRequest()->getParam('order_statuses'))?$this->getRequest()->getParam('order_statuses'):'';
+
+	}else{
+		$order_statuses=	"";
+	}
+
+	if(trim($website1)){
+		$website			=	$website1;
+	}else if($website2){
+		$website			=	$website2;
+	}else{
+		$website			=	$website3;
+	}
+
+	$page					=	($this->getRequest()->getParam('page'))?$this->getRequest()->getParam('page'):'';	
+	$limit					=	($this->getRequest()->getParam('limit'))?$this->getRequest()->getParam('limit'):50;	
+}
+
+$helper 					= 	Mage::helper('customreports');
+$paginationArr 		=	$helper->paginationCtrl($catId,$subCatId,$from,$to,$report_period,$store_ids,$order_statuses,$limit,$page);
+$start					=	$paginationArr['start'];
+$limit					=	($paginationArr['limit'])?$paginationArr['limit']:$limit;
+$pagination				=	$paginationArr['paginationLink'];
+
+$model 					= 	Mage::getModel('customreports/collection');
+$reportArr 				= 	$model->getReport($catId,$subCatId,$from,$to,$report_period,$store_ids,$order_statuses,$start,$limit);
+$gridColSpan			=	$model->gridColSpan($reportArr,$report_period);
+$orderStatus			=	$model->getOrderStatus();
+
+?>
+
+<?php echo $this->getStoreSwitcherHtml() ?>
+<div class="entry-edit">
+	<form method="post" action="<?php echo Mage::helper('core/url')->getCurrentUrl();?>" id="filter_form">
+	<div></div>
+	<div class="entry-edit-head">
+ 		<h4 class="icon-head head-edit-form fieldset-legend">Filter</h4>
+	   <div class="form-buttons"></div>
+	</div>
+ 	<div id="sales_report_base_fieldset" class="fieldset ">
+ 		<div class="hor-scroll">
+      	<table cellspacing="0" class="form-list">
+         	<tbody>
+             	<tr>
+			        <td class="hidden" colspan="2">
+							<input name="form_key" type="hidden" value="<?php echo Mage::getSingleton('core/session')->getFormKey() ?>" />
+							<input type="hidden" value="<?php echo $website;?>" name="store_ids" id="sales_report_store_ids">
+							<input type="hidden" value="<?php echo $limit;?>" name="limit" id="limit">
+							<input type="hidden" value="<?php echo $page;?>" name="page" id="page">
+						</td>
+					</tr>
+					<tr>
+				      <td class="label"><label for="sales_report_period_type">Category</label></td>
+ 						<td class="value">
+        						<select class=" select" title="Period" name="category" id="category" onchange="categoryChange(this)">
+									<option value="">----------------------Please Select----------------------</option>
+									<?php
+									$category 	= 	Mage::getModel('catalog/category');
+									$tree 		= 	$category->getTreeModel();
+									$tree->load();
+
+									$ids 			= 	$tree->getCollection()->getAllIds();
+									if ($ids){
+										foreach ($ids as $id){
+										  	$cat = Mage::getModel('catalog/category');
+										  	$cat->load($id);
+										  	if($cat->getLevel()==2 && $cat->getIsActive()==1){ 
+												$selected = ($catId == $cat->getId())?'selected = true':'';
+												?>
+												<option value=<?php echo $cat->getId();?> <?php echo $selected;?>><?php echo $cat->getName();?></option>
+											<?php } 
+									  	}
+									}?>
+								</select>            
+							</td>
+    					</tr>
+					<tr>
+				      <td class="label"><label for="sales_report_period_type">Sub-Category</label></td>
+ 						<td class="value">
+								<div id="getSubCategory">
+		     						<select class=" select" title="Period" name="subcategory" id="subcategory">
+										<option value="">----------------------Please Select----------------------</option>
+										<?php
+											$catId	=	$this->getRequest()->getParam('category');
+											$children = Mage::getModel('catalog/category')->getCategories($catId);
+											$helper 	= 	Mage::helper('customreports');
+											foreach ($children as $subCategory) { 
+												$selectedSubCategory = ($subCatId == $subCategory->getId())?'selected = true':'';
+												$id = $subCategory->getId();
+												$name = $subCategory->getName();
+												$option .= "<option value='$id' $selectedSubCategory>$name</option>";
+												$option .= $helper->nestedSubCategory($id,3,$subCatId);
+											}
+											echo $option;
+										?>
+									</select>            		
+								</div>
+							</td>
+    					</tr>
+						<tr>
+							<td class="label"><label for="sales_report_show_order_statuses">Order Status</label></td>
+							<td class="value">
+								<select class=" select" name="show_order_statuses" id="sales_report_show_order_statuses" onChange="getStatus()">
+									<option selected="selected" value="0" <?php echo ($showOrderStatus == '0')?'selected=true':'';?>>Any</option>
+									<option value="1" <?php echo ($showOrderStatus == '1')?'selected=true':'';?>>Specified</option>
+								</select>                    
+								<p id="note_show_order_statuses" class="note"><span>Applies to Any of the Specified Order Statuses</span></p>
+							</td>
+						</tr>
+						<tr style="<?php echo ($showOrderStatus == '0' || $showOrderStatus == '')?'display:none':'';?>" id="orderStatus">
+							<td class="label"></td>
+							<td class="value">
+								<select multiple="multiple" class=" select multiselect" size="10" name="order_statuses[]" id="sales_report_order_statuses">
+								<?php
+									foreach ($orderStatus as $orderStatus_row) {
+										$statusName 	= 	$orderStatus_row['status'];
+										$statuslabel	= 	$orderStatus_row['label'];
+										$selected		=	(in_array($statusName, $order_statuses))?'selected=true':'';
+						
+									?>
+										<option value="<?php echo $statusName;?>" <?php echo $selected;?>><?php echo $statuslabel;?></option>
+								<?php	} ?>
+								</select>            
+							</td>
+						</tr>
+						<tr>
+				        	<td class="label"><label for="sales_report_from">From <span class="required">*</span></label></td>
+							<td class="value">
+						      <input type="text" style="width:110px !important;" class=" required-entry input-text" title="From" value="<?php echo $from;?>" id="sales_report_from" name="from"> <img style="" title="Select Date" id="sales_report_from_trig" class="v-middle" alt="" src="<?php echo Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_WEB);?>/skin/adminhtml/default/default/images/grid-cal.gif">
+								<div id="period_date_from_advaice"></div>
+								<script type="text/javascript">
+								//&lt;![CDATA[
+								    Calendar.setup({
+								        inputField: "sales_report_from",
+								        ifFormat: "%m/%e/%Y",
+								        showsTime: false,
+								        button: "sales_report_from_trig",
+								        align: "Bl",
+								        singleClick : true
+								    });
+								//]]&gt;
+								</script>            
+							</td>
+    					</tr>
+						<tr>
+						  <td class="label"><label for="sales_report_to">To <span class="required">*</span></label></td>
+							 <td class="value">
+								  <input type="text" style="width:110px !important;" class=" required-entry input-text" title="To" value="<?php echo $to;?>" id="sales_report_to" name="to"> <img style="" title="Select Date" id="sales_report_to_trig" class="v-middle" alt="" src="<?php echo Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_WEB);?>skin/adminhtml/default/default/images/grid-cal.gif">
+										<div id="period_date_to_advaice"></div>
+										<script type="text/javascript">
+										//&lt;![CDATA[
+											 Calendar.setup({
+												  inputField: "sales_report_to",
+												  ifFormat: "%m/%e/%Y",
+												  showsTime: false,
+												  button: "sales_report_to_trig",
+												  align: "Bl",
+												  singleClick : true
+											 });
+										//]]&gt;
+								</script>            
+							</td>
+    					</tr>
+						<tr>
+							<td class="label"><label for="sales_report_to">Period</label></td>
+							<td class="value">
+                     	<select name="report_period" id="report_period" class="select">
+                           <option value="day" <?php echo ($report_period == 'day')?'selected="true"':'';?>>Day</option>
+                           <option value="month" <?php echo ($report_period == 'month')?'selected="true"':'';?>>Month</option>
+                           <option value="year" <?php echo ($report_period == 'year')?'selected="true"':'';?>>Year</option>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+
+		<table cellspacing="0" class="actions">
+			<tr>
+				<td>
+					<?php echo $pagination;?>
+				</td>
+				<td class=" a-right">
+					<img src="<?php echo $this->getSkinUrl('images/icon_export.gif') ?>" alt="" class="v-middle"/>&nbsp; <?php echo $this->__('Export to:') ?>
+				 		<select name="<?php echo $this->getId() ?>_export" id="<?php echo $this->getId() ?>_export" style="width:8em;">
+							<option value="csv">CSV</option>
+					 </select>
+					 <button style="" onclick="doExport()" class="scalable task" type="button" title="Export" id="export">Export</button>
+				</td>
+			</tr>
+		</table>
+
+	</form>
+</div>
+
+<!-- ----------------------- Grid ---------------------- --->
+
+ <div class="grid">
+   <table cellspacing="0" class="data" id="<?php echo $this->getId() ?>_table">
+       <col/>
+       <?php foreach ($this->getColumns() as $_column): ?>
+           <col <?php echo $_column->getHtmlProperty() ?>/>
+       <?php endforeach; ?>
+
+		<thead>
+			<tr class="headings">
+			  <th class="no-link" style="width:100px"><span class="no-br"><?php echo $this->getPeriodText() ?></span></th>
+			  <?php foreach ($this->getColumns() as $_column): ?>
+					<th <?php echo $_column->getHeaderHtmlProperty() ?>><span class="no-br"><?php echo $_column->getHeaderHtml() ?></span></th>
+			  <?php endforeach; ?>
+			</tr>
+		</thead>
+		<?php if(count($reportArr) == 0):?>
+			<tbody>
+				<tr class="even">
+					<td colspan="5" class="empty-text a-center">No records found.</td>
+				</tr>
+			</tbody>
+		<?php else: ?>
+			<tbody>
+				<?php
+					$totalQty = 0;
+					$totalPrice = 0;	
+					$i = 0;
+					$j = 0;
+					$k = 0;
+					foreach ($reportArr as $arr_row) {
+						$totalQty =	$totalQty+$arr_row['qty_ordered'];
+						$totalPrice = $totalPrice+$arr_row['price'];
+						if($report_period == 'month'){
+							$dateVal1	=	explode("-",$arr_row['created_at']);
+							$createdDate	=	$dateVal1[1]."/".$dateVal1[0];
+						}else if($report_period == 'year'){
+							$dateVal1	=	explode("-",$arr_row['created_at']);
+							$createdDate	=	$dateVal1[0];
+						}else{
+							$date	=	date_create($arr_row['created_at']);
+							$createdDate = date_format($date,"M d, Y");
+						}
+
+						if($gridColSpan[$k] == $i){ 
+							$i = 0;$k++;
+						}
+						if($i == 0){ ?>
+							<tr title="#" class="pointer">
+								<td class=" " rowspan="<?php echo $gridColSpan[$k];?>"><span class="nobr"><?php echo $createdDate;?></span></td>
+								<td class=" "><?php echo $arr_row['name'];?></td>
+								<td class=" a-right "><?php echo $arr_row['sku'];?></td>
+								<td class=" a-right "><?php echo number_format($arr_row['price'], 2, '.', '');?></td>
+								<td class=" a-right last"><?php echo number_format($arr_row['qty_ordered'], 2, '.', '');?></td>
+							</tr>
+
+						<?php }else{ ?>
+							<tr class="">
+								<td class=" "><?php echo $arr_row['name'];?></td>
+								<td class=" a-right "><?php echo $arr_row['sku'];?></td>
+								<td class=" a-right "><?php echo number_format($arr_row['price'], 2, '.', '');?></td>
+								<td class=" a-right last"><?php echo number_format($arr_row['qty_ordered'], 2, '.', '');?></td>
+							</tr/>
+						<?php						
+						} 
+						$i++; 
+					}
+				?>
+			</tbody>
+		  	<tfoot>
+		  		<tr class="totals">
+					<th class="">Total&nbsp;</th>
+					<th class="">&nbsp;</th>
+					<th class=" a-right">&nbsp;</th>
+					<th class=" a-right"><?php echo number_format($totalPrice, 2, '.', '');?>&nbsp;</th>
+					<th class=" a-right"><?php echo number_format($totalQty, 2, '.', '');?>&nbsp;</th>
+				</tr>
+			</tfoot>
+		<?php endif; ?>
+   </table>
+</div>
+
+<script type="text/javascript">
+
+    function filterFormSubmit() {
+
+        var filters = $$('#sales_report_from', '#sales_report_to');
+        var elements = [];
+        for(var i in filters){
+            if(filters[i].value && filters[i].value.length && !filters[i].disabled) elements.push(filters[i]);
+        }
+
+        var validator  = new Validation('filter_form');
+        if (validator.validate()) {
+				document.getElementById("export").value= '';
+				document.getElementById("page").value= '';
+            document.forms["filter_form"].submit();
+        }
+    }
+
+	function categoryChange(cat){
+		var catId 			= 	cat.value;
+		var newArrivals	=	"";
+
+		$url = '<?php echo $this->getUrl("customreports/report_index/getsubcategory");?>?catId='+catId;
+		new Ajax.Request($url, {
+		  onSuccess: function(response) {
+				console.log(response);
+				document.getElementById('getSubCategory').innerHTML = response.responseText;
+		  }
+		});
+	}
+
+	function doExport(){
+		var exportType = document.getElementById("customReport_export").value;
+		$parm = '?period=<?php echo $report_period;?>&catId=<?php echo $catId;?>&subCatId=<?php echo $subCatId;?>&from=<?php echo $from;?>&to=<?php echo $to;?>&store_id=<?php echo $store_id;?>&order_statuses=<?php echo $order_statuses;?>';
+		$url = '<?php echo $this->getUrl("customreports/report_index/csv_export");?>'+$parm;
+		document.location.href= $url;
+	}
+
+	function getStatus(){
+		if(document.getElementById("sales_report_show_order_statuses").value == '1'){
+			document.getElementById("orderStatus").style.display='';
+		}else{
+			document.getElementById("orderStatus").style.display="none";	
+		}
+	}
+
+	function getPaginationLimit(val){
+		var limit	=	val.value;
+		document.getElementById("limit").value= limit;
+		document.forms["filter_form"].submit();
+	}
+
+	function setPage(page){
+		document.getElementById("page").value= page;
+		document.forms["filter_form"].submit();
+	}
+
+</script>
+
+
+

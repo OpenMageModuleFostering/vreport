@@ -1,0 +1,5 @@
+.vtrioCustPagination { font-family:Arial, Helvetica, sans-serif;padding: 3px;	margin: 3px;}
+.vtrioCustPagination a { padding:2px 5px 2px 5px; margin:2px;	border:1px solid #999;	text-decoration:none;	color: #666;}
+.vtrioCustPagination a:hover, .paginate a:active {	border: 1px solid #999;	color: #000;}
+.vtrioCustPagination span.current {	margin: 2px;	padding: 2px 5px 2px 5px;	border: 1px solid #999;	font-weight: bold;	background-color: #999;	color: #FFF;}
+.vtrioCustPagination span.disabled {	padding:2px 5px 2px 5px;	margin:2px;	border:1px solid #eee;	color:#DDD;}
