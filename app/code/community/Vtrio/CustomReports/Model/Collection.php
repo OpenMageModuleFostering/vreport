@@ -174,12 +174,12 @@ class Vtrio_CustomReports_Model_Collection extends Mage_Core_Model_Abstract
 			}
 			
 			
-		   $sale_flat_table= Mage::getSingleton('core/resource')->getTableName('sales_flat_order_item'); 
+		    $sale_flat_table= Mage::getSingleton('core/resource')->getTableName('sales_flat_order_item'); 
 			$sales_flat_order_table =  Mage::getSingleton('core/resource')->getTableName('sales_flat_order'); 
-			
+			$sales_flat_order_address =  Mage::getSingleton('core/resource')->getTableName('sales_flat_order_address'); 
 			$sql = "SELECT sfoi.created_at as date, sfoi.name, sfoi.sku, sfoi.price, sfoi.qty_ordered,
-									(select CONCAT(sfoa.firstname,' ',sfoa.lastname,'\n',sfoa.street,'\n',sfoa.city,', ',sfoa.region,', ',sfoa.postcode,'\n',sfoa.country_id) from sales_flat_order_address as sfoa where sfoa.entity_id=sfo.shipping_address_id) as shipping_address,
-									(select CONCAT(sfoa1.firstname,' ',sfoa1.lastname,'\n',sfoa1.street,'\n',sfoa1.city,', ',sfoa1.region,', ',sfoa1.postcode,'\n',sfoa1.country_id) from sales_flat_order_address as sfoa1 where sfoa1.entity_id=sfo.billing_address_id) as billing_address									
+									(select CONCAT(sfoa.firstname,' ',sfoa.lastname,'\n',sfoa.street,'\n',sfoa.city,', ',sfoa.region,', ',sfoa.postcode,'\n',sfoa.country_id) from $sales_flat_order_address as sfoa where sfoa.entity_id=sfo.shipping_address_id) as shipping_address,
+									(select CONCAT(sfoa1.firstname,' ',sfoa1.lastname,'\n',sfoa1.street,'\n',sfoa1.city,', ',sfoa1.region,', ',sfoa1.postcode,'\n',sfoa1.country_id) from $sales_flat_order_address as sfoa1 where sfoa1.entity_id=sfo.billing_address_id) as billing_address									
 									FROM $sale_flat_table as sfoi
 									left join $sales_flat_order_table as sfo on sfo.entity_id=sfoi.order_id
 										$category
