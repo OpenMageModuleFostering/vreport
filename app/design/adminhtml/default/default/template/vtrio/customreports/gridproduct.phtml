@@ -201,6 +201,7 @@ $orderStatus			=	$model->getOrderStatus();
 					<img src="<?php echo $this->getSkinUrl('images/icon_export.gif') ?>" alt="" class="v-middle"/>&nbsp; <?php echo $this->__('Export to:') ?>
 				 		<select name="<?php echo $this->getId() ?>_export" id="<?php echo $this->getId() ?>_export" style="width:8em;">
 							<option value="csv">CSV</option>
+                                                        <option value="pdf">PDF</option>
 					 </select>
 					 <button style="" onclick="doExport()" class="scalable task" type="button" title="Export" id="export">Export</button>
 				</td>
@@ -327,8 +328,17 @@ $orderStatus			=	$model->getOrderStatus();
 	function doExport(){
 		var exportType = document.getElementById("customReport_export").value;
 		$parm = '?period=<?php echo $report_period;?>&catId=<?php echo $catId;?>&subCatId=<?php echo $subCatId;?>&from=<?php echo $from;?>&to=<?php echo $to;?>&store_id=<?php echo $store_id;?>&order_statuses=<?php echo $order_statuses;?>';
-		$url = '<?php echo $this->getUrl("customreports/report_index/csv_export");?>'+$parm;
-		document.location.href= $url;
+                if(exportType=="pdf")                    
+                    {
+                        $url = '<?php echo $this->getUrl("customreports/report_index/pdf_export");?>'+$parm;
+                        var win = window.open($url, '_blank');
+                        win.focus();
+                    }
+                else
+                    {
+                        $url = '<?php echo $this->getUrl("customreports/report_index/csv_export");?>'+$parm;
+                        document.location.href= $url;
+                    }
 	}
 
 	function getStatus(){

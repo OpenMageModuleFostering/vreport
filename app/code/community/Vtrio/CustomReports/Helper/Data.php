@@ -201,4 +201,124 @@ class Vtrio_CustomReports_Helper_Data extends Mage_Core_Helper_Abstract
 
 		return $returnVal;		
 	}
+        
+        
+       public function exportReportToPDF($reportArr,$report_period)
+	{
+                    require_once(Mage::getBaseDir().DS.'skin'.DS.'adminhtml'.DS.'default'.DS.'default'.DS.'vtriocustomreport'.DS.'fpdf'.DS.'fpdf.php');    
+                $logo = Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_SKIN).'adminhtml/default/default/vtriocustomreport/images/vreport_logo.png';   
+                $pdf = new FPDF();
+                
+                    
+                
+            $pdf->AddPage('L');
+            $pdf->SetFont('Arial','B',24);
+               
+                // Colors, line width and bold font
+            $pdf->SetFillColor(69,69,69);
+            $pdf->SetDrawColor(255,255,255);
+            $pdf->Cell(275,15,'Sales Report','LR',0,'C');
+            $pdf->SetTextColor(255);
+            
+            $pdf->SetLineWidth(0.3);
+            $pdf->SetFont('Arial','B',11);
+            // Logo
+    $pdf->Image($logo,10,6,30);
+     $pdf->Ln(20);
+     $pdf->SetDrawColor(69,69,69);
+       $pdf->SetDrawColor(255,255,255);
+     $pdf->Cell($w[0],28,'..........','LR',0,'L',$fill);
+
+    // Line break
+    $pdf->Ln(10);
+            
+            
+            // Header
+            $w = array(5, 28, 65, 37, 20, 20, 50,75,60);
+            $header	=	array('#','Period', 'Product Name', 'SKU', 'Tot Price', 'Q.Ordered', 'Billing Address', 'Shipping Address');
+            for($i=0;$i<count($header);$i++)
+                    $pdf->Cell($w[$i],12,$header[$i],1,0,'C',true);
+            $pdf->Ln();
+            // Color and font restoration
+            $pdf->SetFillColor(224,235,255);
+            $pdf->SetTextColor(0);
+            $pdf->SetFont('');
+            // Data
+            $fill = false;
+
+       
+            // Closing line
+	
+		
+		$fp 	= 	fopen('php://output', 'w');
+		if ($fp && $reportArr) {
+			
+                    
+                    $indexVal = 0;
+                    
+                    
+			foreach ($reportArr as $arr_row) {
+                            $x = $pdf->GetX();
+                           
+                            
+				$values = array();
+                                $indexVal++;
+				$totalQty =	$totalQty+$arr_row['qty_ordered'];
+				$totalPrice = $totalPrice+$arr_row['price'];
+				$shippingAddr = $arr_row['shipping_address'];
+				$billingAddr = $arr_row['billing_address'];
+				if($report_period == 'month'){
+					$dateVal1	=	explode("-",$arr_row['created_at']);
+					$createdDate	=	$dateVal1[1]."/".$dateVal1[0];
+				}else if($report_period == 'year'){
+					$dateVal1	=	explode("-",$arr_row['created_at']);
+					$createdDate	=	$dateVal1[0];
+				}else{
+					$date	=	date_create($arr_row['created_at']);
+					$createdDate = date_format($date,"M d, Y");
+				}
+				array_push($values,$createdDate,$arr_row['name'],$arr_row['sku'],number_format($arr_row['price'], 2, '.', ''),number_format($arr_row['qty_ordered'], 2, '.', ''),$billingAddr,$shippingAddr);
+				
+                                
+                                $pdf->Cell($w[0],28,$indexVal,'LR',0,'L',$fill);
+                                $pdf->Cell($w[1],28,$createdDate,'LR',0,'L',$fill);
+                                $pdf->Cell($w[2],28,  substr($arr_row['name'],0,50),'LR',0,'L',$fill);
+                                $pdf->Cell($w[3],28,$arr_row['sku'],'LR',0,'L',$fill);
+                                $pdf->Cell($w[4],28,number_format($arr_row['price'], 2, '.', ''),'LR',0,'L',$fill);
+                                
+                                $pdf->Cell($w[5],28,number_format($arr_row['qty_ordered'], 2, '.', ''),'LR',0,'L',$fill);
+                                
+                                 $y = $pdf->GetY();
+                                $pdf->SetXY($x + 175, $y);
+                                $pdf->MultiCell($w[6],7,$billingAddr,0,'L',$fill);
+                                $pdf->SetXY($x + 225, $y);
+                                $pdf->MultiCell($w[7],7,$shippingAddr,0,'L',$fill);
+                                $pdf->Ln();
+                                $fill = !$fill;
+			}
+                        $pdf->Ln();
+                         $pdf->Cell($w[0],28,'','LR',0,'L',$fill);
+                         $pdf->Cell($w[1],28,'','LR',0,'L',$fill);
+                         $pdf->Cell($w[2],28,'Total' ,'LR',0,'L',$fill);
+                         $pdf->Cell($w[3],28,'','LR',0,'L',$fill);
+                         $pdf->Cell($w[4],28,number_format($totalPrice, 2, '.', ''),'LR',0,'L',$fill);
+                                
+                         $pdf->Cell($w[5],28,number_format($totalQty, 2, '.', ''),'LR',0,'L',$fill);
+//                        array_push($values,'','Total','',number_format($totalPrice, 2, '.', ''),number_format($totalQty, 2, '.', ''));
+                        
+			$pdf->Cell(array_sum($w),0,'','T');
+                        $pdf->Output();
+
+
+			die;
+
+		}
+
+		else {
+
+			echo "no result";	
+
+		}			
+
+	}
 }

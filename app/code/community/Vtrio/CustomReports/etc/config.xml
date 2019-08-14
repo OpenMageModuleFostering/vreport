@@ -2,7 +2,7 @@
 <config>
 	<modules>
 		<Vtrio_CustomReports>
-			<version>1.0.1</version>
+			<version>2.0.0</version>
 		</Vtrio_CustomReports>
 	</modules>
 	<global>

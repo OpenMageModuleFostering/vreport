@@ -91,5 +91,22 @@ class Vtrio_CustomReports_Report_IndexController extends Mage_Adminhtml_Controll
 		$helper 			= 	Mage::helper('customreports');
 		$returnResult 	= 	$helper->exportReportToCSV($reportArr,$report_period);
 	}
+        
+   public function pdf_exportAction(){
+		
+		$catId			=	$this->getRequest()->getParam('catId');
+		$subCatId		=	$this->getRequest()->getParam('subCatId');
+		$from				=	$this->getRequest()->getParam('from');
+		$to				=	$this->getRequest()->getParam('to');
+		$report_period	=	$this->getRequest()->getParam('period');
+		$store_ids		=	$this->getRequest()->getParam('store_id');
+		$order_statuses=	$this->getRequest()->getParam('order_statuses');
+
+		$model 			= 	Mage::getModel('customreports/collection');
+		$reportArr 		= 	$model->getReportCSV($catId,$subCatId,$from,$to,$report_period,$store_ids,$order_statuses);
+
+		$helper 			= 	Mage::helper('customreports');
+		$returnResult 	= 	$helper->exportReportToPDF($reportArr,$report_period);
+	}
 
 }
