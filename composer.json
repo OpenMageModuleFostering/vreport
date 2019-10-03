@@ -1,16 +1,19 @@
 {
-    "name": "OpenMageModuleFostering/VReport",
+    "name": "OpenMageModuleFostering\/VReport",
     "type": "magento-module",
     "license": "MITL",
     "homepage": "",
     "description": "VReport 2.0 is version that is an enhanced version of Vreport 1. ",
     "authors": [
-    {
-        "name": "Developer",
-        "email": "dev@vtrio.com"
-    }
-],
+        {
+            "name": "Developer",
+            "email": "dev@vtrio.com"
+        }
+    ],
     "suggest": {
-        "magento-hackathon/magento-composer-installer": "*"
-    }
+        "magento-hackathon\/magento-composer-installer": "*"
+    },
+    "keywords": [
+        "openmage-module"
+    ]
 }
