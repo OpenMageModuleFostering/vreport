@@ -1,7 +1,7 @@
 {
-    "name": "OpenMageModuleFostering\/VReport",
+    "name": "openmage-module-fostering\/vreport",
     "type": "magento-module",
-    "license": "MITL",
+    "license": "OSL-3.0",
     "homepage": "",
     "description": "VReport 2.0 is version that is an enhanced version of Vreport 1. ",
     "authors": [
